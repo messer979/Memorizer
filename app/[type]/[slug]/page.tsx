@@ -10,6 +10,9 @@ export function generateStaticParams() {
   return getAllPieceParams();
 }
 
+// The whole library is enumerated at build time; 404 unknown slugs statically.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {

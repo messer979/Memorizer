@@ -8,6 +8,9 @@ export function generateStaticParams() {
   return CONTENT_TYPES.map((type) => ({ type }));
 }
 
+// Every type is known at build time; 404 anything else without hitting the FS.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {
