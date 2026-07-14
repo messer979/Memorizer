@@ -77,6 +77,25 @@ Every piece page has three reading modes:
 - **First letters** — each word collapses to its first letter (`Whose woods…` →
   `W… w…`), the classic recall drill. Tap a line to check yourself.
 
+## Latin word lookup
+
+On any piece **tagged `latin`**, the Read view lets you look up a word: select
+it (or double-click) and a **Look up** button appears; clicking it opens a
+definition popover.
+
+Definitions come from public dictionaries, not a hand-maintained lexicon, via a
+small server route (`app/api/define`):
+
+- **Whitaker's Words** — parses *inflected* Latin forms back to the dictionary
+  headword and reports the grammar (case/tense/mood). This is what makes
+  clicking `spiritui` resolve to `spiritus`.
+- **Wiktionary** — used as a fallback and for other languages; returns clean
+  JSON definitions.
+
+The route caches results and never hard-fails: if an upstream is down it just
+returns whatever it has, and the popover shows a graceful message. To enable
+lookup on a piece, add `latin` to its `tags`.
+
 ## Project layout
 
 ```
@@ -84,7 +103,8 @@ app/
   page.tsx                 # home / full library
   [type]/page.tsx          # a category listing (poems | prayers | hymns)
   [type]/[slug]/page.tsx   # an individual piece
-components/                # Reader, AudioPlayer, PieceList, MarkdownView
+  api/define/route.ts      # dictionary lookup proxy (Whitaker's + Wiktionary)
+components/                # Reader, AudioPlayer, PieceList, LookupProvider
 lib/
   content.ts               # reads & parses markdown from /content
   types.ts                 # content types + frontmatter shape

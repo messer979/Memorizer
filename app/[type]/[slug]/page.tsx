@@ -78,7 +78,10 @@ export default async function PiecePage({
         </div>
       )}
 
-      <Reader content={piece.content} />
+      <Reader
+        content={piece.content}
+        lookupLang={piece.tags?.includes("latin") ? "la" : undefined}
+      />
     </article>
   );
 }

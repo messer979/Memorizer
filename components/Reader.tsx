@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
+import LookupProvider from "./LookupProvider";
 
 type Mode = "read" | "blur" | "initials";
 
@@ -21,7 +22,14 @@ function toInitials(line: string): string {
   return line.replace(/\b([A-Za-z])[A-Za-z'’-]*/g, "$1…");
 }
 
-export default function Reader({ content }: { content: string }) {
+export default function Reader({
+  content,
+  lookupLang,
+}: {
+  content: string;
+  /** When set, enables click-to-look-up in read mode (e.g. "la" for Latin). */
+  lookupLang?: string;
+}) {
   const [mode, setMode] = useState<Mode>("read");
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
 
@@ -71,14 +79,29 @@ export default function Reader({ content }: { content: string }) {
             Tap a line to reveal it
           </span>
         )}
+        {mode === "read" && lookupLang && (
+          <span className="ml-auto text-xs text-muted">
+            Double-click a word to look it up
+          </span>
+        )}
       </div>
 
       {mode === "read" ? (
-        <div className="verse text-lg">
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-            {content}
-          </ReactMarkdown>
-        </div>
+        lookupLang ? (
+          <LookupProvider lang={lookupLang}>
+            <div className="verse text-lg">
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                {content}
+              </ReactMarkdown>
+            </div>
+          </LookupProvider>
+        ) : (
+          <div className="verse text-lg">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+              {content}
+            </ReactMarkdown>
+          </div>
+        )
       ) : (
         <div className="text-lg leading-[1.9]">
           {lines.map((raw, i) => {
