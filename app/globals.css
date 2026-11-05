@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/*
+ * exsurge draws the ℟ and ℣ signs in chant with this font, but the npm
+ * package doesn't ship it, so we serve it ourselves (MIT, from exsurge's
+ * assets/fonts).
+ */
+@font-face {
+  font-family: "Exsurge Characters";
+  src: url("/fonts/ExsurgeChar.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
   --background: #faf8f3;
   --foreground: #2b2620;
@@ -67,4 +80,14 @@ body {
   padding-left: 1rem;
   color: var(--muted);
   font-style: italic;
+}
+
+/*
+ * exsurge's SVG output leaves its note glyphs (shared <use> defs) unfilled,
+ * so they'd always be black. fill inherits into a <use>'s contents, so this
+ * makes the notes follow the theme; the hollow parts of notes already get
+ * their color from negativeFillColor in ChantScore.
+ */
+.chant-score use {
+  fill: var(--foreground);
 }
