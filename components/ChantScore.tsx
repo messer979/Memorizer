@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 /**
  * Renders Gregorian chant in square notation from gabc, using exsurge
@@ -13,12 +13,21 @@ import { useEffect, useRef, useState } from "react";
 export default function ChantScore({
   gabc,
   label,
+  dropCap = true,
+  size = 1,
 }: {
   gabc: string;
   /** Accessible name for the rendered score, e.g. the piece's title. */
   label?: string;
+  /** Whether the first letter is set as a large initial (off for small examples). */
+  dropCap?: boolean;
+  /** Multiplier for the notes and text (e.g. 1.5 for small illustrative examples). */
+  size?: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  // Each score's glyph defs and styles are looked up page-wide by id/class,
+  // so several scores on one page need distinct prefixes.
+  const idPrefix = `chant${useId().replace(/[^a-zA-Z0-9]/g, "")}-`;
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
@@ -57,10 +66,10 @@ export default function ChantScore({
         const paper = color("--background", "#fff");
 
         // Shrink everything a little on narrow screens.
-        const scale = width < 520 ? 0.8 : 1;
+        const scale = (width < 520 ? 0.8 : 1) * size;
 
         const ctxt = new ex.ChantContext();
-        ctxt.defIdPrefix = "chant-";
+        ctxt.defIdPrefix = idPrefix;
         ctxt.textColor = ink;
         ctxt.setFont("Georgia, 'Times New Roman', serif", 18 * scale);
         ctxt.setGlyphScaling((1 / 16) * scale);
@@ -72,7 +81,7 @@ export default function ChantScore({
         ctxt.negativeFillColor = paper;
 
         const mappings = ex.Gabc.createMappingsFromSource(ctxt, gabc);
-        const score = new ex.ChantScore(ctxt, mappings, true);
+        const score = new ex.ChantScore(ctxt, mappings, dropCap);
         const header = new ex.GabcHeader(gabc);
         ex.Gabc.applyHeader(score, ctxt, header);
 
@@ -98,7 +107,10 @@ export default function ChantScore({
         setStatus("ready");
       } catch (err) {
         console.error("Failed to render chant", err);
-        if (!cancelled) setStatus("error");
+        if (!cancelled && id === renderId) {
+          container!.replaceChildren();
+          setStatus("error");
+        }
       }
     }
 
@@ -121,7 +133,7 @@ export default function ChantScore({
       resizeObserver.disconnect();
       scheme.removeEventListener("change", render);
     };
-  }, [gabc, label]);
+  }, [gabc, label, dropCap, size, idPrefix]);
 
   return (
     <figure>

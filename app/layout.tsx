@@ -33,6 +33,9 @@ export default function RootLayout({
                   {TYPE_LABELS[type].plural}
                 </Link>
               ))}
+              <Link href="/chant" className="hover:text-accent transition-colors">
+                Chant
+              </Link>
             </nav>
           </div>
         </header>

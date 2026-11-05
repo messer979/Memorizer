@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
@@ -86,6 +87,14 @@ export default function Reader({
           <span className="ml-auto text-xs text-muted">
             Tap a line to reveal it
           </span>
+        )}
+        {mode === "chant" && (
+          <Link
+            href="/chant"
+            className="ml-auto text-xs text-muted hover:text-accent transition-colors"
+          >
+            How to read chant →
+          </Link>
         )}
         {mode === "read" && lookupLang && (
           <span className="ml-auto text-xs text-muted">
