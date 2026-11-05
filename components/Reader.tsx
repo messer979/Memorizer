@@ -5,8 +5,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import LookupProvider from "./LookupProvider";
+import ChantScore from "./ChantScore";
 
-type Mode = "read" | "blur" | "initials";
+type Mode = "read" | "chant" | "blur" | "initials";
 
 /** Strip the most common inline markdown so memorize views read cleanly. */
 function stripMarkdown(line: string): string {
@@ -25,8 +26,14 @@ function toInitials(line: string): string {
 export default function Reader({
   content,
   lookupLang,
+  gabc,
+  title,
 }: {
   content: string;
+  /** Chant notation (gabc); when set, adds a "Chant" view. */
+  gabc?: string;
+  /** The piece's title, used to label the chant score for screen readers. */
+  title?: string;
   /** When set, enables click-to-look-up in read mode (e.g. "la" for Latin). */
   lookupLang?: string;
 }) {
@@ -56,6 +63,7 @@ export default function Reader({
         {(
           [
             ["read", "Read"],
+            ...(gabc ? [["chant", "Chant"]] : []),
             ["blur", "Blur"],
             ["initials", "First letters"],
           ] as [Mode, string][]
@@ -74,7 +82,7 @@ export default function Reader({
             {label}
           </button>
         ))}
-        {mode !== "read" && (
+        {(mode === "blur" || mode === "initials") && (
           <span className="ml-auto text-xs text-muted">
             Tap a line to reveal it
           </span>
@@ -86,7 +94,12 @@ export default function Reader({
         )}
       </div>
 
-      {mode === "read" ? (
+      {mode === "chant" && gabc ? (
+        <ChantScore
+          gabc={gabc}
+          label={title ? `${title}, in Gregorian chant notation` : undefined}
+        />
+      ) : mode === "read" ? (
         lookupLang ? (
           <LookupProvider lang={lookupLang}>
             <div className="verse text-lg">

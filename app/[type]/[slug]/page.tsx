@@ -80,6 +80,8 @@ export default async function PiecePage({
 
       <Reader
         content={piece.content}
+        gabc={piece.gabc}
+        title={piece.title}
         lookupLang={piece.tags?.includes("latin") ? "la" : undefined}
       />
     </article>

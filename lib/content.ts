@@ -70,7 +70,10 @@ export function getPiece(type: ContentType, slug: string): Piece | null {
   const file = `${slug}.md`;
   const fullPath = path.join(typeDir(type), file);
   if (!fs.existsSync(fullPath)) return null;
-  return parsePiece(type, file);
+  const piece = parsePiece(type, file);
+  const gabcPath = path.join(typeDir(type), `${slug}.gabc`);
+  if (fs.existsSync(gabcPath)) piece.gabc = fs.readFileSync(gabcPath, "utf8");
+  return piece;
 }
 
 /** For generateStaticParams: every (type, slug) pair. */

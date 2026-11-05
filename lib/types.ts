@@ -34,6 +34,12 @@ export interface PieceMeta extends PieceFrontmatter {
 export interface Piece extends PieceMeta {
   /** Raw markdown body (frontmatter stripped). */
   content: string;
+  /**
+   * Gregorian chant notation for the piece, in gabc, read from a sidecar
+   * file next to the markdown (e.g. content/hymns/o-spem-miram.gabc).
+   * When present, the reader offers a "Chant" view rendered by exsurge.
+   */
+  gabc?: string;
 }
 
 export function isContentType(value: string): value is ContentType {
